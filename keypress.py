@@ -7,6 +7,7 @@ from Xlib.display import Display
 import threading
 import os 
 import time
+import Xlib
 
 notes=[440,494,523,587,659,698,784]
  
@@ -35,7 +36,17 @@ class KeyPress(threading.Thread):
 
 def main(): 
 	disp = Display()
-	while 1:
+	screen = disp.screen()
+	w = screen.root.create_window(0, 0, 100, 100, 1,
+		screen.root_depth,
+		event_mask = Xlib.X.KeyPressMask)
+	w.map()
+	
+	while True:
+		event = disp.next_event()
+		if event.type != Xlib.X.KeyPress:
+			continue
+		
 		keymap = disp.query_keymap() 
 		if keymap not in ignorelist: 
 			KeyPress().start()
